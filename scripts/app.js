@@ -73,6 +73,18 @@ function createNewItem(e) {
     <button>X</button>
     </li>`;
     actualUl.insertAdjacentHTML('beforeend', li);
+    //Supression item
+    const item = actualUl.lastElementChild;
+    const liBtn = item.querySelector('button');
+    handleItemDeletion(liBtn);
+    //Vider l'input
+    actualTextInput.value = "";
+}
+function handleItemDeletion(btn) {
+    btn.addEventListener('click', () => {
+        const elToRemove = btn.parentElement;
+        elToRemove.remove();
+    });
 }
 //Fonction permettant de mettre tous les éléments du container courant dans des variables pour pouvoir les utiliser
 function setContainerItem(btn) {
@@ -83,3 +95,18 @@ function setContainerItem(btn) {
     actualTextInput = actualContainer.querySelector('input');
     actualValidation = actualContainer.querySelector('.validation-msg');
 }
+//Add New Container
+const addContainerBtn = document.querySelector('.add-container-btn');
+const addContainerForm = document.querySelector('.add-new-container form');
+const addContainerFormInput = document.querySelector('.add-new-container input');
+const validationNewContainer = document.querySelector(".add-new-container .validation-msg");
+const addContainerCloseBtn = document.querySelector('.close-add-list');
+const addNewContainer = document.querySelector('.add-new-container');
+const containersList = document.querySelector('.main-content');
+//Ouvrir et fermer le formulaire :
+addContainerBtn.addEventListener('click', () => {
+    toggleForm(addContainerBtn, addContainerForm, true);
+});
+addContainerCloseBtn.addEventListener('click', () => {
+    toggleForm(addContainerBtn, addContainerForm, false);
+});

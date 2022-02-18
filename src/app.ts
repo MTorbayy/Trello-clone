@@ -93,6 +93,21 @@ function createNewItem(e: Event) {
     <button>X</button>
     </li>`
     actualUl.insertAdjacentHTML('beforeend', li)
+
+    //Supression item
+    const item = actualUl.lastElementChild as HTMLLIElement
+    const liBtn = item.querySelector('button') as HTMLButtonElement
+    handleItemDeletion(liBtn)
+
+    //Vider l'input
+    actualTextInput.value = ""
+}
+
+function handleItemDeletion(btn: HTMLButtonElement) {
+    btn.addEventListener('click', () => {
+        const elToRemove = btn.parentElement as HTMLLIElement
+        elToRemove.remove()
+    })
 }
 
 //Fonction permettant de mettre tous les éléments du container courant dans des variables pour pouvoir les utiliser
@@ -105,3 +120,23 @@ function setContainerItem(btn: HTMLButtonElement) {
     actualTextInput = actualContainer.querySelector('input') as HTMLInputElement
     actualValidation = actualContainer.querySelector('.validation-msg') as HTMLSpanElement
 }
+
+
+//Add New Container
+
+const addContainerBtn = document.querySelector('.add-container-btn') as HTMLButtonElement
+const addContainerForm = document.querySelector('.add-new-container form') as HTMLFormElement
+const addContainerFormInput = document.querySelector('.add-new-container input') as HTMLInputElement
+const validationNewContainer = document.querySelector(".add-new-container .validation-msg") as HTMLSpanElement
+const addContainerCloseBtn = document.querySelector('.close-add-list') as HTMLButtonElement
+const addNewContainer = document.querySelector('.add-new-container') as HTMLDivElement
+const containersList = document.querySelector('.main-content')
+
+//Ouvrir et fermer le formulaire :
+addContainerBtn.addEventListener('click', () => {
+    toggleForm(addContainerBtn, addContainerForm, true)
+})
+
+addContainerCloseBtn.addEventListener('click', () => {
+    toggleForm(addContainerBtn, addContainerForm, false)
+})
