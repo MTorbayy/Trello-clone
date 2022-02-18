@@ -12,11 +12,17 @@ let actualContainer: HTMLDivElement,
 
 function addContainerListeners(currentContainer: HTMLDivElement) {
 
-    const currentContainerDeletionBtn = currentContainer.querySelector('.delete-container-btn') as HTMLButtonElement
+    //Récupération des éléments (boutons, formulaire) du container :
+    const currentContainerDeletionBtn = currentContainer.querySelector('.delete-container-btn') as HTMLButtonElement;
     const currentAddItemBtn = currentContainer.querySelector('.add-item-btn') as HTMLButtonElement
+    const currentCloseFormBtn = currentContainer.querySelector('.close-form-btn') as HTMLButtonElement
+    const currentForm = currentContainer.querySelector('form') as HTMLFormElement
 
+    //Attribution de fonctions aux boutons :
     deleteBtnListeners(currentContainerDeletionBtn)
     addItemBtnListeners(currentAddItemBtn)
+    closingFormBtnListeners(currentCloseFormBtn)
+    addFormSubmitListeners(currentForm)
 
 }
 
@@ -31,14 +37,20 @@ itemsContainer.forEach((container: HTMLDivElement) => {
 function deleteBtnListeners(btn: HTMLButtonElement) {
     btn.addEventListener('click', handleContainerDeletion)
 }
-
 function addItemBtnListeners(btn: HTMLButtonElement) {
     btn.addEventListener('click', handleAddItem)
+}
+function closingFormBtnListeners(btn: HTMLButtonElement) {
+    btn.addEventListener('click', () => toggleForm(actualBtn, actualForm, false))
+}
+
+function addFormSubmitListeners(form: HTMLFormElement) {
+    form.addEventListener('submit', createNewItem)
 }
 
 //Fonctions déclenchées par les évènements
 
-function handleContainerDeletion(e : MouseEvent) {
+function handleContainerDeletion(e: MouseEvent){
     const btn = e.target as HTMLButtonElement;
     const btnsArray = [...document.querySelectorAll('.delete-container-btn')] as HTMLButtonElement[];
     const containers = [...document.querySelectorAll('.items-container')] as HTMLDivElement[];
@@ -48,7 +60,7 @@ function handleContainerDeletion(e : MouseEvent) {
 function handleAddItem(e: MouseEvent) {
     const btn = e.target as HTMLButtonElement
     if(actualContainer) {
-        actualContainer.style.display = "none"
+        toggleForm(actualBtn, actualForm, false)
     }
     setContainerItem(btn)
     toggleForm(actualBtn, actualForm, true)
@@ -62,6 +74,25 @@ function toggleForm(btn: HTMLButtonElement, form: HTMLFormElement, action: boole
         form.style.display = "block"
         btn.style.display = "none"
     }
+}
+
+function createNewItem(e: Event) {
+    e.preventDefault()
+    //Validation :
+    if(actualTextInput.value.length === 0) {
+        actualValidation.textContent = "Must be at least 1 character long"
+        return
+    } else {
+        actualValidation.textContent = ""
+    }
+
+    //Création Item (li)
+    const itemContent = actualTextInput.value
+    const li = `<li class="item" draggable="true">
+    <p>${itemContent}</p>
+    <button>X</button>
+    </li>`
+    actualUl.insertAdjacentHTML('beforeend', li)
 }
 
 //Fonction permettant de mettre tous les éléments du container courant dans des variables pour pouvoir les utiliser

@@ -3,10 +3,16 @@ const itemsContainer = document.querySelectorAll('.items-container');
 let actualContainer, actualBtn, actualUl, actualForm, actualTextInput, actualValidation;
 // Container général de toutes les fonctions addEventListener
 function addContainerListeners(currentContainer) {
+    //Récupération des éléments (boutons, formulaire) du container :
     const currentContainerDeletionBtn = currentContainer.querySelector('.delete-container-btn');
     const currentAddItemBtn = currentContainer.querySelector('.add-item-btn');
+    const currentCloseFormBtn = currentContainer.querySelector('.close-form-btn');
+    const currentForm = currentContainer.querySelector('form');
+    //Attribution de fonctions aux boutons :
     deleteBtnListeners(currentContainerDeletionBtn);
     addItemBtnListeners(currentAddItemBtn);
+    closingFormBtnListeners(currentCloseFormBtn);
+    addFormSubmitListeners(currentForm);
 }
 //Appel de chaque container avec la fonction précédente
 itemsContainer.forEach((container) => {
@@ -19,6 +25,12 @@ function deleteBtnListeners(btn) {
 function addItemBtnListeners(btn) {
     btn.addEventListener('click', handleAddItem);
 }
+function closingFormBtnListeners(btn) {
+    btn.addEventListener('click', () => toggleForm(actualBtn, actualForm, false));
+}
+function addFormSubmitListeners(form) {
+    form.addEventListener('submit', createNewItem);
+}
 //Fonctions déclenchées par les évènements
 function handleContainerDeletion(e) {
     const btn = e.target;
@@ -29,7 +41,7 @@ function handleContainerDeletion(e) {
 function handleAddItem(e) {
     const btn = e.target;
     if (actualContainer) {
-        toggleForm(actualBtn, actualForm, false)
+        toggleForm(actualBtn, actualForm, false);
     }
     setContainerItem(btn);
     toggleForm(actualBtn, actualForm, true);
@@ -43,6 +55,24 @@ function toggleForm(btn, form, action) {
         form.style.display = "block";
         btn.style.display = "none";
     }
+}
+function createNewItem(e) {
+    e.preventDefault();
+    //Validation :
+    if (actualTextInput.value.length === 0) {
+        actualValidation.textContent = "Must be at least 1 character long";
+        return;
+    }
+    else {
+        actualValidation.textContent = "";
+    }
+    //Création Item (li)
+    const itemContent = actualTextInput.value;
+    const li = `<li class="item" draggable="true">
+    <p>${itemContent}</p>
+    <button>X</button>
+    </li>`;
+    actualUl.insertAdjacentHTML('beforeend', li);
 }
 //Fonction permettant de mettre tous les éléments du container courant dans des variables pour pouvoir les utiliser
 function setContainerItem(btn) {
