@@ -138,6 +138,8 @@ let dragSrcEl: HTMLElement
 function handleDragStart(this: HTMLElement, e: DragEvent) {
     e.stopPropagation()
 
+    //Ici this correspond à l'élément sélectionné au départ
+
     if(actualContainer) {
         toggleForm(actualBtn, actualForm, false)
     }
@@ -154,6 +156,7 @@ function handleDragOver(e: DragEvent) {
 }
 
 
+//handleDrop gère l'élément de réception :
 
 function handleDrop(this: HTMLElement, e: DragEvent) {
     e.stopPropagation()
@@ -168,9 +171,47 @@ function handleDrop(this: HTMLElement, e: DragEvent) {
         //On rajoute les fonctions qu'on veut pouvoir utiliser sur ce nouvel élément, dont la fonction de D&D car elle a été supprimée au passage :
         addDDListeners(dragSrcEl)
         handleItemDeletion(dragSrcEl.querySelector("button") as HTMLButtonElement)
+
+    } 
+    
+    if(dragSrcEl !== this && this.classList[0] === dragSrcEl.classList[0]) {
+        //Dans le cas où je veux échanger un item avec un autre item ou une li avec une autre li : ils doivent être différents, mais avoir la même classe
         
-    } else if(dragSrcEl.nodeName === "DIV" && receptionEl.classList.contains("main-content")) {
-        (receptionEl.appendChild(dragSrcEl))
+        //On remplace l'élément sélectionné par l'élément visé :
+        dragSrcEl.innerHTML = this.innerHTML
+
+        //On remplace l'élément visé par l'élément sélectionné, avec la méthode getData qui récupère ce qui a été défini avec setData précédemment :
+        this.innerHTML = e.dataTransfer?.getData('text/html') as string
+
+        //On rajoute les fonctions qu'on veut pouvoir utiliser sur ce nouvel élément, en fonction de sa nature (liste ou container) :
+        if(this.classList.contains("items-container")) { 
+            addContainerListeners(this as HTMLDivElement)
+
+            this.querySelectorAll('li').forEach((li: HTMLLIElement) => {
+                handleItemDeletion(li.querySelector('button') as HTMLButtonElement)
+                addDDListeners(li)
+            })
+        } else {
+            addDDListeners(this)
+            handleItemDeletion(this.querySelector('button') as HTMLButtonElement)
+        }
+    }
+}
+
+// handleDragEnd gère l'élément qu'on a sélectionné à la base une fois tout le process terminé :
+
+function handleDragEnd(this: HTMLElement, e: DragEvent) {
+    e.stopPropagation()
+   
+    if(this.classList.contains('items-container')) {
+        addContainerListeners(this as HTMLDivElement)
+
+        this.querySelectorAll('li').forEach((li: HTMLLIElement) => {
+            handleItemDeletion(li.querySelector('button') as HTMLButtonElement)
+            addDDListeners(li)
+            } )
+    } else {
+    addDDListeners(this)
     }
 }
 

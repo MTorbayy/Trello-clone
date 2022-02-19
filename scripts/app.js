@@ -108,6 +108,7 @@ let dragSrcEl;
 function handleDragStart(e) {
     var _a;
     e.stopPropagation();
+    //Ici this correspond à l'élément sélectionné au départ
     if (actualContainer) {
         toggleForm(actualBtn, actualForm, false);
     }
@@ -120,7 +121,9 @@ function handleDragOver(e) {
     e.preventDefault();
     //Obligatoire pour faire fonctionner le D&D
 }
+//handleDrop gère l'élément de réception :
 function handleDrop(e) {
+    var _a;
     e.stopPropagation();
     //Ici this correspond à l'élément de réception :
     const receptionEl = this;
@@ -131,8 +134,38 @@ function handleDrop(e) {
         addDDListeners(dragSrcEl);
         handleItemDeletion(dragSrcEl.querySelector("button"));
     }
-    else if (dragSrcEl.nodeName === "DIV" && receptionEl.classList.contains("main-content")) {
-        (receptionEl.appendChild(dragSrcEl));
+    if (dragSrcEl !== this && this.classList[0] === dragSrcEl.classList[0]) {
+        //Dans le cas où je veux échanger un item avec un autre item ou une li avec une autre li : ils doivent être différents, mais avoir la même classe
+        //On remplace l'élément sélectionné par l'élément visé :
+        dragSrcEl.innerHTML = this.innerHTML;
+        //On remplace l'élément visé par l'élément sélectionné, avec la méthode getData qui récupère ce qui a été défini avec setData précédemment :
+        this.innerHTML = (_a = e.dataTransfer) === null || _a === void 0 ? void 0 : _a.getData('text/html');
+        //On rajoute les fonctions qu'on veut pouvoir utiliser sur ce nouvel élément, en fonction de sa nature (liste ou container) :
+        if (this.classList.contains("items-container")) {
+            addContainerListeners(this);
+            this.querySelectorAll('li').forEach((li) => {
+                handleItemDeletion(li.querySelector('button'));
+                addDDListeners(li);
+            });
+        }
+        else {
+            addDDListeners(this);
+            handleItemDeletion(this.querySelector('button'));
+        }
+    }
+}
+// handleDragEnd gère l'élément qu'on a sélectionné à la base une fois tout le process terminé :
+function handleDragEnd(e) {
+    e.stopPropagation();
+    if (this.classList.contains('items-container')) {
+        addContainerListeners(this);
+        this.querySelectorAll('li').forEach((li) => {
+            handleItemDeletion(li.querySelector('button'));
+            addDDListeners(li);
+        });
+    }
+    else {
+        addDDListeners(this);
     }
 }
 //Add New Container
